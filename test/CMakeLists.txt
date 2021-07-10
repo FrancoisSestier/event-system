@@ -44,6 +44,6 @@ gtest_discover_tests(event-system_test)
 
 
 if (ENABLE_TEST_COVERAGE)
-  target_compile_options(event-system INTERFACE /DEBUG -gdwarf-3 -O0 -g -fprofile-arcs -ftest-coverage)
+  target_compile_options(event-system INTERFACE -gdwarf-3 -O0 -g -fprofile-arcs -ftest-coverage)
   target_link_options(event-system INTERFACE -fprofile-arcs -ftest-coverage)
 endif()
