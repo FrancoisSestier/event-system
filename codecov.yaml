@@ -1,0 +1,6 @@
+ignore:
+  - "test"
+  - "include/antity/utility/robin_hood.h"
+
+codecov:
+  max_report_age: off

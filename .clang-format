@@ -1,0 +1,9 @@
+---
+Language:         Cpp
+BasedOnStyle:  Google
+IndentWidth: 4
+TabWidth: 4
+PointerAlignment: Left
+NamespaceIndentation: All
+BreakBeforeBinaryOperators: All
+BreakBeforeTernaryOperators: 'true'
