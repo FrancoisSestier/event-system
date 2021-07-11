@@ -21,13 +21,34 @@ int main(){
     eventHandler.on<Event1>([](Event1 e){ std::cout << "Event 1 a : " << e.a << std::end });
     eventHandler.on<Event1>([](Event1 e){ std::cout << "Event 1 b : " << e.b << std::end });
     eventHandler.on<Event2>([](Event2 e){ std::cout << "Event 2 s : " << e.s << std::end });
+
+    // Synchronous Event Dispatching 
+
     eventHandler.emit<Event1>(1,2);
     //Output :
     //Event 1 a : 1
     //Event 1 a : 2
+    
     eventHandler.emit<Event2>("test");
     //Output :
     //Event 2 s : test
+    
+    // Asynchronous Event Dispatching
+    
+    epp::event_queue event_queue1;
+    epp::event_queue event_queue2;
+    
+    event_queue1.push<Event1>(3, 4);
+    event_queue1.push<Event2>("hi");
+    
+    std::swap(event_queue1, event_queue2)
+    
+    eventHandler.emit(event_queue2);
+    //Output :
+    //Event 1 a : 3
+    //Event 1 a : 4
+    //Event 2 s : hi
+    
 
 }
 
