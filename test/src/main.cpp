@@ -73,3 +73,10 @@ TEST(Dispatcher, Queues) {
     ASSERT_TRUE(queue.empty());
 
 }
+
+TEST(Event,MakeBus) {
+    using some_event = event_type_list<event<A>,event<B>>;
+
+    auto bus = make_bus<some_event>();
+
+}

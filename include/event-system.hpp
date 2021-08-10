@@ -3,7 +3,7 @@
 #include <functional>
 #include <queue>
 #include <unordered_map>
-
+#include <utility>
 namespace epp {
 
     namespace details {
@@ -71,6 +71,7 @@ namespace epp {
 
     }  // namespace details
 
+
     template <typename event_type>
     class event {
        public:
@@ -97,6 +98,9 @@ namespace epp {
 
     template <typename T>
     concept dispatchable = details::is_specialization_v<T, event>;
+
+    template<dispatchable ...Ts>
+    struct event_type_list{};
 
     template <dispatchable... event_types>
     requires(details::are_distinct_v<event_types...>) class event_queue {
@@ -213,6 +217,16 @@ namespace epp {
        private:
         storage event_callback_list_;
     };
+
+    namespace details {
+
+        template<dispatchable ...Ts>
+        bus<Ts...> to_bus(event_type_list<Ts...>);
+
+    }
+
+    template<typename T> requires(details::is_specialization_v<T, event_type_list>)
+    auto make_bus() {return decltype(details::to_bus(std::declval<T>()))();}
 
     /*
         class dispatcher {
