@@ -99,9 +99,6 @@ namespace epp {
     template <typename T>
     concept dispatchable = details::is_specialization_v<T, event>;
 
-    template<dispatchable ...Ts>
-    struct event_type_list{};
-
     template <dispatchable... event_types>
     requires(details::are_distinct_v<event_types...>) class event_queue {
        public:
@@ -218,15 +215,27 @@ namespace epp {
         storage event_callback_list_;
     };
 
+    template<dispatchable ...Ts>
+    struct event_type_list{
+        using bus_type = bus<Ts...>;
+        using queue_type = event_queue<Ts...>;
+    };
+
     namespace details {
 
         template<dispatchable ...Ts>
         bus<Ts...> to_bus(event_type_list<Ts...>);
 
+        template<dispatchable ...Ts>
+        event_queue<Ts...> to_queue(event_type_list<Ts...>);
+
     }
 
     template<typename T> requires(details::is_specialization_v<T, event_type_list>)
     auto make_bus() {return decltype(details::to_bus(std::declval<T>()))();}
+
+    template<typename T> requires(details::is_specialization_v<T, event_type_list>)
+    auto make_event_queue() {return decltype(details::to_queue(std::declval<T>()))();}
 
     /*
         class dispatcher {
