@@ -6,28 +6,42 @@ usage : include event-system.hpp in your project
 # Usage Design
 ```c++
 
-struct Event1{
+struct A{
     int a;
     int b;
 };
 
-struct Event2 {
+struct B {
     string s;
 };
 
-int main(){
-    epp::dispatcher eventHandler;
 
-    eventHandler.on<Event1>([](Event1 e){ std::cout << "Event 1 a : " << e.a << std::end });
-    eventHandler.on<Event1>([](Event1 e){ std::cout << "Event 1 b : " << e.b << std::end });
-    eventHandler.on<Event2>([](Event2 e){ std::cout << "Event 2 s : " << e.s << std::end });
-    eventHandler.emit<Event1>(1,2);
-    //Output :
-    //Event 1 a : 1
-    //Event 1 a : 2
-    eventHandler.emit<Event2>("test");
-    //Output :
-    //Event 2 s : test
+using namespace epp;
+
+using event_A = event<A>; // alternative solution 
+
+int main(){
+    bus<event<A>> bus; // create bus 
+    int a = 0;
+    int b = 0;
+    event_queue<event_A, event<B>> queue; // create queue
+
+    // attach callbacks
+    bus.attach_back<event<A>>([&](event<A> e) {
+        a = e->a;
+        e.consume();
+    }); 
+
+    bus.attach_back<event<A>>([&](event<A> e) {
+        //will never fire since event callback before always consume event<A> 
+    });
+
+    bus.attach_front<event<A>>([&](event<A> e) { //will always fire since it's before the event consuming callback 
+     });
+
+    queue.push_back<event<A>>(1, 2);
+
+    bus.dipatch(queue);
 
 }
 
