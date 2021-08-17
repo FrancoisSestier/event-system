@@ -113,6 +113,7 @@ namespace epp {
         event_queue& operator=(event_queue&& other) {
             if(this != &other) {
                 internal_queue_ = std::move(other.internal_queue_);
+                other.internal_queue_.reset();
             }
         }
 
