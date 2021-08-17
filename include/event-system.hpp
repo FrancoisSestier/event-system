@@ -115,6 +115,7 @@ namespace epp {
                 internal_queue_ = std::move(other.internal_queue_);
                 other.internal_queue_.reset();
             }
+            return *this;
         }
 
         event_queue(const event_queue& other) = delete;
