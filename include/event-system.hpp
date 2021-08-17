@@ -90,7 +90,7 @@ namespace epp {
 
         event_type& operator*() { return event_; }
 
-        bool alive() const { return consumed_; }
+        bool alive() const { return !consumed_; }
 
        private:
         bool consumed_ = false;
@@ -165,7 +165,7 @@ namespace epp {
     requires(details::are_distinct_v<event_types...>) class bus {
        public:
         template <dispatchable T>
-        using event_callback = std::function<void(T)>;
+        using event_callback = std::function<void(T&)>;
 
         template <dispatchable T>
         using event_callback_list = std::vector<event_callback<T>>;
@@ -184,7 +184,7 @@ namespace epp {
             event_callback<T> callback) {
             auto& callbacks
                 = std::get<event_callback_list<T>>(event_callback_list_);
-            callbacks.insert(callbacks.begin(), 0);
+            callbacks.insert(callbacks.begin(), callback);
         }
 
         template <dispatchable T>
@@ -210,7 +210,7 @@ namespace epp {
         }
 
         template <dispatchable T>
-        void dipatch(T& e) {
+        void dipatch(T& e) {    
             if constexpr (details::contains_v<T, event_types...>) {
                 for (auto& callback : std::get<event_callback_list<T>>(event_callback_list_)) {
                     if (e.alive()) {

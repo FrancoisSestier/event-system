@@ -24,19 +24,19 @@ TEST(Dispatcher, Bus) {
     int b = 0;
     std::string s;
 
-    bus.attach_back<event<A>>([&](event<A> e) {
+    bus.attach_back<event<A>>([&](event<A>& e) {
         a = e->a;
         e.consume();
         ASSERT_EQ(e->a, 1);
     });
 
-    bus.attach_back<event<A>>([&](event<A> e) {
+    bus.attach_back<event<A>>([&](event<A>& e) {
         ASSERT_EQ(
             1,
             100);  // always false checking if event consuming is working right
     });
 
-    bus.attach_front<event<A>>([&](event<A> e) { ASSERT_EQ(a, 0); });
+    bus.attach_front<event<A>>([&](event<A>& e){ ASSERT_EQ(a, 0); });
 
     bus.dipatch<event<A>>(1, 2);
 }
@@ -46,19 +46,19 @@ TEST(Dispatcher, Queues) {
     int a = 0;
     int b = 0;
     event_queue<event<A>, event<B>> queue;
-    bus.attach_back<event<A>>([&](event<A> e) {
+    bus.attach_back<event<A>>([&](event<A>& e) {
         a = e->a;
         e.consume();
         ASSERT_EQ(e->a, 1);
     });
 
-    bus.attach_back<event<A>>([&](event<A> e) {
+    bus.attach_back<event<A>>([&](event<A>& e) {
         ASSERT_EQ(
             1,
             100);  // always false checking if event consuming is working right
     });
 
-    bus.attach_front<event<A>>([&](event<A> e) { ASSERT_EQ(a, 0); });
+    bus.attach_front<event<A>>([&](event<A> e){ ASSERT_EQ(a, 0); });
 
     queue.push_back<event<A>>(1, 2);
 
