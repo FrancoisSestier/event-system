@@ -4,6 +4,7 @@
 #include <queue>
 #include <unordered_map>
 #include <utility>
+#include <memory>
 namespace epp {
 
     namespace details {
@@ -106,45 +107,58 @@ namespace epp {
         using internal_event_queues = std::tuple<std::vector<event_types>...>;
 
        public:
+        event_queue() : internal_queue_(std::make_unique<internal_event_queues>()) {}
+        ~event_queue() = default;
+        event_queue(event_queue&& other) : internal_queue_(std::move(other.internal_queue_)) {}
+        event_queue& operator=(event_queue&& other) {
+            if(this != &other) {
+                internal_queue_ = std::move(other.internal_queue_);
+            }
+        }
+
+        event_queue(const event_queue& other) = delete;
+        event_queue& operator=(const event_queue& other) = delete;
+
         template <dispatchable T, typename... Args>
         requires(details::contains_v<T, event_types...>) void push_back(
             Args... args) {
-            std::get<std::vector<T>>(event_queue_)
+            std::get<std::vector<T>>(*internal_queue_)
                 .emplace_back(T(std::forward<Args>(args)...));
         }
 
         template <dispatchable T>
         requires(details::contains_v<T, event_types...>) auto begin() {
-            return std::get<std::vector<T>>(event_queue_).begin();
+            return std::get<std::vector<T>>(*internal_queue_).begin();
         }
 
         template <dispatchable T>
         requires(details::contains_v<T, event_types...>) auto end() {
-            return std::get<std::vector<T>>(event_queue_).end();
+            return std::get<std::vector<T>>(*internal_queue_).end();
         }
 
         bool empty() {
             bool empty = true;
             ((empty
-              &= std::get<std::vector<event_types>>(event_queue_).empty()),
+              &= std::get<std::vector<event_types>>(*internal_queue_).empty()),
              ...);
             return empty;
         }
 
         void clear() {
-            ((std::get<std::vector<event_types>>(event_queue_).clear()), ...);
+            ((std::get<std::vector<event_types>>(*internal_queue_).clear()), ...);
         }
 
         size_t size() {
             size_t size(0);
-            ((size += std::get<std::vector<event_types>>(event_queue_).size()),
+            ((size += std::get<std::vector<event_types>>(*internal_queue_).size()),
              ...);
             return size;
         }
 
        private:
-        internal_event_queues event_queue_;
+        std::unique_ptr<internal_event_queues> internal_queue_;
     };
+
     template <dispatchable... event_types>
     requires(details::are_distinct_v<event_types...>) class bus {
        public:
