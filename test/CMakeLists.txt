@@ -35,7 +35,7 @@ file(GLOB_RECURSE sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cp
 
 enable_testing()
 add_executable(event-system_test ${sources})
-target_link_libraries(event-system_test debug gtest_main event-system)
+target_link_libraries(event-system_test debug gtest gtest_main event-system)
 set_target_properties(event-system_test PROPERTIES CXX_STANDARD 20)
 
 include(GoogleTest)

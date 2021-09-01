@@ -201,7 +201,7 @@ namespace epp {
         template <dispatchable T, typename... Args>
         requires(details::contains_v<T, event_types...>) void dipatch(
             Args... args) {
-            T e(T::undelying_type(std::forward<Args>(args)...));
+            T e(typename T::undelying_type(std::forward<Args>(args)...));
             for (auto& callback : std::get<event_callback_list<T>>(event_callback_list_)) {
                 if (e.alive()) {
                     callback(e);
@@ -222,7 +222,7 @@ namespace epp {
 
         template <dispatchable... Ts>
         void dipatch(event_queue<Ts...>& e_queue) {
-            ((std::for_each(e_queue.begin<Ts>(), e_queue.end<Ts>(),
+            ((std::for_each(e_queue.template begin<Ts>(), e_queue.template end<Ts>(),
                             [=](Ts& e) { dipatch(e); })),
              ...);
         }
